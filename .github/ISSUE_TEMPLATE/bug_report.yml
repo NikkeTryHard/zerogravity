@@ -1,0 +1,102 @@
+name: Bug Report
+description: Something isn't working right
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please fill out the info below so we can debug faster.
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: e.g. Ubuntu 24.04, macOS 15.2, Windows 11
+      placeholder: Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Running Mode
+      description: How are you running ZeroGravity?
+      options:
+        - Headless (default, --headless)
+        - Classic (--classic, attached to running Antigravity)
+        - No MITM (--no-mitm)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ZeroGravity Version / Commit
+      description: "Output of `git rev-parse --short HEAD` or the version you downloaded"
+      placeholder: 4966d8f
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model Used
+      description: Which model were you using when the issue occurred?
+      placeholder: gemini-3-flash
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the issue clearly. What did you expect vs what actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Paste relevant log output. You can get logs with:
+        - `zg logs-all` (full logs)
+        - `journalctl --user -u zerogravity --no-pager -n 200` (systemd)
+        - Or check `~/.config/zerogravity/` for log files
+      render: text
+
+  - type: textarea
+    id: trace
+    attributes:
+      label: Call Trace
+      description: |
+        If available, paste the trace summary for the failing request.
+        Traces are saved to `~/.config/zerogravity/traces/YYYY-MM-DD/`.
+        You can get the latest one with:
+        ```
+        TRACE_DIR=~/.config/zerogravity/traces/$(date +%Y-%m-%d)
+        cat "$TRACE_DIR/$(ls -t "$TRACE_DIR" | head -1)/summary.md"
+        ```
+      render: markdown
+
+  - type: textarea
+    id: health
+    attributes:
+      label: Health Check Output
+      description: |
+        Paste the output of:
+        ```
+        curl -s http://localhost:8741/health | jq .
+        zg status
+        ```
+      render: json
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this? Include the curl command or client config if applicable.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Context
+      description: Anything else — screenshots, network setup (VPN/proxy), Antigravity version, etc.

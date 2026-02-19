@@ -1,0 +1,9 @@
+target/
+.git/
+.github/
+.gemini/
+.agent/
+.worktrees/
+docs/
+*.md
+!README.md

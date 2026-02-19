@@ -1,0 +1,19 @@
+# Build
+/target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+*.pem
+zerogravity/
+.ace-tool/
+AgentLogs/

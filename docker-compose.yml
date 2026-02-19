@@ -1,0 +1,15 @@
+services:
+  zerogravity:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8741:8741"
+      - "8742:8742"
+    volumes:
+      # Auto-read OAuth token from host's Antigravity config.
+      # If Antigravity is not installed, this is harmless (empty dir).
+      - ${HOME}/.config/Antigravity:/root/.config/Antigravity:ro
+    environment:
+      - ZEROGRAVITY_TOKEN=${ZEROGRAVITY_TOKEN:-}
+      - ZEROGRAVITY_UPSTREAM_PROXY=${ZEROGRAVITY_UPSTREAM_PROXY:-}
+      - RUST_LOG=info
