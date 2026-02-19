@@ -48,11 +48,14 @@
 ## Quick Start
 
 ```bash
-# Headless mode (no running Antigravity app needed)
-RUST_LOG=info ./zerogravity --headless
+# First-run setup (auto-detects token, configures PATH)
+zg init
 
-# Or use the daemon manager
+# Start the proxy daemon
 zg start
+
+# Check status (version, endpoints, quota, usage)
+zg status
 ```
 
 ## Authentication
@@ -222,7 +225,15 @@ docker run -d --name zerogravity \
   ghcr.io/nikketryhard/zerogravity:latest
 ```
 
-**Docker Compose:**
+**Docker Compose (auto-generated):**
+
+```bash
+# Generate docker-compose.yml + .env with auto-detected token
+zg docker-init
+docker compose up -d
+```
+
+**Docker Compose (manual):**
 
 ```bash
 docker compose up -d
@@ -247,22 +258,32 @@ docker compose up -d
 
 ## `zg` Commands
 
-| Command              | Description                                 |
-| -------------------- | ------------------------------------------- |
-| `zg start`           | Start the proxy daemon                      |
-| `zg stop`            | Stop the proxy daemon                       |
-| `zg restart`         | Stop + start (no build/download)            |
-| `zg update`          | Download latest binary from GitHub Releases |
-| `zg status`          | Service status + quota + usage              |
-| `zg logs [N]`        | Show last N lines (default 30)              |
-| `zg logs-follow [N]` | Tail last N lines + follow                  |
-| `zg logs-all`        | Full log dump                               |
-| `zg test [msg]`      | Quick test request (gemini-3-flash)         |
-| `zg health`          | Health check                                |
-| `zg trace`           | Show latest trace summary                   |
-| `zg trace ls`        | List last 10 traces                         |
-| `zg trace dir`       | Print trace base directory                  |
-| `zg trace errors`    | Show today's error traces                   |
+### Setup
+
+| Command          | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| `zg init`        | First-run setup wizard (token, PATH, client hints)     |
+| `zg token`       | Extract OAuth token from local Antigravity state.vscdb |
+| `zg docker-init` | Generate docker-compose.yml + .env in current dir      |
+
+### Service
+
+| Command              | Description                                               |
+| -------------------- | --------------------------------------------------------- |
+| `zg start`           | Start the proxy daemon                                    |
+| `zg stop`            | Stop the proxy daemon                                     |
+| `zg restart`         | Stop + start (no build/download)                          |
+| `zg update`          | Download latest release from GitHub (updates zg + binary) |
+| `zg status`          | Version, endpoints, quota, usage, and update check        |
+| `zg logs [N]`        | Show last N lines (default 30)                            |
+| `zg logs-follow [N]` | Tail last N lines + follow                                |
+| `zg logs-all`        | Full log dump                                             |
+| `zg test [msg]`      | Quick test request (gemini-3-flash)                       |
+| `zg health`          | Health check                                              |
+| `zg trace`           | Show latest trace summary                                 |
+| `zg trace ls`        | List last 10 traces                                       |
+| `zg trace dir`       | Print trace base directory                                |
+| `zg trace errors`    | Show today's error traces                                 |
 
 ## License
 
