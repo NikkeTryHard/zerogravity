@@ -45,22 +45,16 @@ body:
     attributes:
       label: Operating System
       options:
-        - Ubuntu 24.04
-        - Ubuntu 22.04
-        - Ubuntu 20.04
-        - Debian 12 (Bookworm)
-        - Debian 11 (Bullseye)
-        - Fedora 41
-        - Fedora 40
+        - Ubuntu / Debian
+        - Fedora / RHEL
         - Arch Linux
-        - CentOS / RHEL 9
-        - CentOS / RHEL 8
-        - macOS 15 (Sequoia)
-        - macOS 14 (Sonoma)
-        - WSL2 (Ubuntu)
-        - WSL2 (Other)
+        - Other Linux
+        - macOS
+        - Windows 11
+        - Windows 10
+        - WSL2
         - Docker
-        - Other (specify in Additional Context)
+        - Other
     validations:
       required: true
 
