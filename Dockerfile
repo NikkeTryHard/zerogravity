@@ -88,10 +88,13 @@ RUN mkdir -p /root/.config/zerogravity \
 
 EXPOSE 8741 8742
 
+# Auth: mount accounts.json for multi-account rotation, or set ZEROGRAVITY_ACCOUNTS env var
+VOLUME ["/root/.config/zerogravity"]
+
 ENV RUST_LOG=info
 ENV ZEROGRAVITY_TOKEN=""
+ENV ZEROGRAVITY_ACCOUNTS=""
 ENV ZEROGRAVITY_API_KEY=""
-ENV ZEROGRAVITY_UPSTREAM_PROXY=""
 ENV ZEROGRAVITY_LS_PATH="/usr/local/bin/language_server_linux_x64"
 
 ENTRYPOINT ["zerogravity"]

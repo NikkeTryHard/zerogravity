@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  OpenAI, Anthropic, and Gemini-compatible proxy for Google's Antigravity.
+  OpenAI, Anthropic, and Gemini-compatible proxy.
 </p>
 
 > **Early stage.** Ran this on OpenCode with an Ultra account for 3 days straight, stress testing the whole time. No issues so far.
@@ -39,14 +39,10 @@
 | --------------------- | ---------------------------- | ------------------- |
 | `opus-4.6`            | Claude Opus 4.6 (Thinking)   | Default model       |
 | `sonnet-4.6`          | Claude Sonnet 4.6 (Thinking) | —                   |
-| `opus-4.5`            | Claude Opus 4.5 (Thinking)   | —                   |
-| `gemini-3.1-pro`      | Gemini 3.1 Pro (High)        | Default 3.1 tier    |
-| `gemini-3.1-pro-high` | Gemini 3.1 Pro (High)        | Alias               |
-| `gemini-3.1-pro-low`  | Gemini 3.1 Pro (Low)         | —                   |
-| `gemini-3-pro`        | Gemini 3 Pro (High)          | Default Pro tier    |
-| `gemini-3-pro-high`   | Gemini 3 Pro (High)          | Alias               |
-| `gemini-3-pro-low`    | Gemini 3 Pro (Low)           | —                   |
 | `gemini-3-flash`      | Gemini 3 Flash               | Recommended for dev |
+| `gemini-3.1-pro`      | Gemini 3.1 Pro (High)        | Experimental        |
+| `gemini-3.1-pro-high` | Gemini 3.1 Pro (High)        | Alias               |
+| `gemini-3.1-pro-low`  | Gemini 3.1 Pro (Low)         | Experimental        |
 
 ## Quick Start
 
@@ -73,76 +69,41 @@ zg update
 
 ## Endpoints
 
-| Method | Path                              | Description                          |
-| ------ | --------------------------------- | ------------------------------------ |
-| `POST` | `/v1/chat/completions`            | Chat Completions API (OpenAI compat) |
-| `POST` | `/v1/responses`                   | Responses API (sync + streaming)     |
-| `POST` | `/v1/messages`                    | Messages API (Anthropic compat)      |
-| `POST` | `/v1beta/models/{model}:{action}` | Official Gemini v1beta routes        |
-| `GET`  | `/v1/models`                      | List available models                |
-| `POST` | `/v1/token`                       | Set OAuth token at runtime           |
-| `GET`  | `/v1/usage`                       | Proxy token usage                    |
-| `GET`  | `/v1/quota`                       | Quota and rate limits                |
-| `GET`  | `/health`                         | Health check                         |
+| Method     | Path                              | Description                           |
+| ---------- | --------------------------------- | ------------------------------------- |
+| `POST`     | `/v1/chat/completions`            | Chat Completions API (OpenAI compat)  |
+| `POST`     | `/v1/responses`                   | Responses API (sync + streaming)      |
+| `POST`     | `/v1/messages`                    | Messages API (Anthropic compat)       |
+| `POST`     | `/v1beta/models/{model}:{action}` | Official Gemini v1beta routes         |
+| `GET`      | `/v1/models`                      | List available models                 |
+| `GET/POST` | `/v1/search`                      | Web Search via Google grounding (WIP) |
+| `POST`     | `/v1/token`                       | Set OAuth token at runtime            |
+| `POST`     | `/v1/accounts`                    | Add account (email + refresh_token)   |
+| `GET`      | `/v1/accounts`                    | List stored accounts                  |
+| `DELETE`   | `/v1/accounts`                    | Remove account by email               |
+| `GET`      | `/v1/usage`                       | Proxy token usage                     |
+| `GET`      | `/v1/quota`                       | Quota and rate limits                 |
+| `GET`      | `/health`                         | Health check                          |
 
 ## Setup
 
-### Download Binary
+### Docker (Recommended)
 
-```bash
-# x86_64
-curl -fsSL https://github.com/NikkeTryHard/zerogravity/releases/latest/download/zerogravity-linux-x86_64 -o zerogravity
-curl -fsSL https://github.com/NikkeTryHard/zerogravity/releases/latest/download/zg-linux-x86_64 -o zg
-chmod +x zerogravity zg
-
-# ARM64
-curl -fsSL https://github.com/NikkeTryHard/zerogravity/releases/latest/download/zerogravity-linux-arm64 -o zerogravity
-curl -fsSL https://github.com/NikkeTryHard/zerogravity/releases/latest/download/zg-linux-arm64 -o zg
-chmod +x zerogravity zg
-```
-
-### Linux
-
-```bash
-./scripts/setup-linux.sh
-zg start
-```
-
-### macOS
-
-```bash
-./scripts/setup-macos.sh
-zg start
-```
-
-### Windows
-
-```powershell
-# Run as Administrator
-powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
-.\zerogravity.exe
-```
-
-### Docker
-
-**Recommended (auto-refresh via Antigravity config mount):**
-
-If Antigravity is installed on the host, mount its config dir and the proxy auto-detects `state.vscdb` for token refresh — no env vars needed:
+**With accounts.json for auto-refresh:**
 
 ```bash
 docker run -d --name zerogravity \
   -p 8741:8741 -p 8742:8742 \
-  -v $HOME/.config/Antigravity:/root/.config/Antigravity:ro \
+  -v ./accounts.json:/root/.config/zerogravity/accounts.json:ro \
   ghcr.io/nikketryhard/zerogravity:latest
 ```
 
-**With manual token:**
+**With env var:**
 
 ```bash
 docker run -d --name zerogravity \
   -p 8741:8741 -p 8742:8742 \
-  -e ZEROGRAVITY_TOKEN=ya29.xxx \
-  -e ZEROGRAVITY_API_KEY=your-secret-key \
+  -e ZEROGRAVITY_ACCOUNTS="user@gmail.com:1//refresh_token" \
   ghcr.io/nikketryhard/zerogravity:latest
 ```
 
@@ -153,17 +114,49 @@ zg docker-init
 docker compose up -d
 ```
 
-> **Note:** The Docker image bundles all required backend components — no Antigravity installation needed on the host. If Antigravity IS installed, mounting the config dir gives you automatic token refresh with no manual token management.
+> **Note:** The Docker image bundles all required backend components — no Antigravity installation needed on the host.
+
+### Native (Not Recommended)
+
+Setup scripts and pre-built binaries exist for Linux, macOS, and Windows but are not actively tested. See `scripts/` and the [releases page](https://github.com/NikkeTryHard/zerogravity/releases) for binaries. Docker is the preferred deployment method.
 
 ## Authentication
 
-The proxy needs an OAuth token:
+The proxy uses **refresh tokens** for persistent authentication. Refresh tokens are long-lived and auto-renew access tokens — no manual token management needed.
 
-1. **Env var**: `ZEROGRAVITY_TOKEN=ya29.xxx`
-2. **Token file**: `~/.config/zerogravity/token`
-3. **Runtime**: `curl -X POST http://localhost:8741/v1/token -d '{ "token": "ya29.xxx" }'`
+### Getting Refresh Tokens
 
-> **Docker users:** When you set a token via `/v1/token`, it's automatically pushed to the backend within 5 seconds — no container restart needed.
+1. Install [Antigravity](https://github.com/NikkeTryHard/zerogravity) on your desktop
+2. Login with your Google account
+3. Run `zg extract` — this copies the refresh token to `~/.config/zerogravity/accounts.json`
+
+**To add more accounts:**
+
+1. Open Antigravity and sign in with a different Google account
+2. **Quit** Antigravity completely (not just close the window)
+3. **Relaunch** Antigravity and confirm the avatar icon changed
+4. Run `zg extract` again
+
+### Setting Tokens
+
+| Method                 | Description                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `accounts.json`        | File with refresh tokens — recommended for Docker (mount as volume)                     |
+| `ZEROGRAVITY_ACCOUNTS` | Env var: `email1:1//token1,email2:1//token2`                                            |
+| `POST /v1/accounts`    | Runtime: `curl -X POST .../v1/accounts -d '{"email":"x@y.z","refresh_token":"1//xxx"}'` |
+| `ZEROGRAVITY_TOKEN`    | Single access token (expires in 60min, not recommended)                                 |
+| `POST /v1/token`       | Runtime access token injection                                                          |
+
+### Account Rotation
+
+When running with 2+ accounts, the proxy **automatically rotates** to the next account when Google returns `RESOURCE_EXHAUSTED` (429). The rotation:
+
+- Waits a short cooldown (5-10s)
+- Refreshes the next account's access token via OAuth
+- Restarts the backend to get a clean session
+- Clears all rate limiter state
+
+No manual intervention needed — quota exhaustion is handled transparently.
 
 ### API Key Protection (Optional)
 
@@ -195,118 +188,54 @@ curl http://localhost:8741/v1/messages \
 
 > **Note:** If `ZEROGRAVITY_API_KEY` is not set, no API key authentication is enforced (backward-compatible). The `/health` and `/` endpoints are always public.
 
-<details>
-<summary>How to get the token</summary>
-
-1. Open Antigravity → **Help** > **Toggle Developer Tools**
-2. Go to the **Network** tab
-3. Send any prompt in the chat
-4. Find a request to `127.0.0.1` (look for `SendUserCascadeMessage` or `GetCommandModelConfigs`)
-5. Right-click → **Copy as cURL**
-6. Paste the cURL into any LLM and ask it to extract the `ya29.` token
-
-> The token is in the JSON body under `metadata.apiKey`, not in an HTTP header.
-
-> **Note:** OAuth tokens expire after ~1 hour. If Antigravity is installed on the same machine, auto-refresh works automatically.
-
-</details>
-
-<details>
-<summary>Auto-refresh with state.vscdb (recommended for Docker / remote servers)</summary>
-
-If Antigravity is installed on the same machine, token refresh works automatically — no config needed.
-
-For remote servers or Docker containers, copy the `state.vscdb` file from any machine where Antigravity is logged in. This database contains a long-lived **refresh token** that lets the proxy auto-refresh access tokens indefinitely.
-
-#### 1. Find `state.vscdb` on the machine with Antigravity
-
-| OS          | Path                                                                       |
-| ----------- | -------------------------------------------------------------------------- |
-| **Linux**   | `~/.config/Antigravity/User/globalStorage/state.vscdb`                     |
-| **macOS**   | `~/Library/Application Support/Antigravity/User/globalStorage/state.vscdb` |
-| **Windows** | `%APPDATA%\Antigravity\User\globalStorage\state.vscdb`                     |
-
-#### 2. Copy to your server / Docker host
-
-Just the single `state.vscdb` file — no other files needed.
-
-#### 3. Mount and configure
-
-**Docker (recommended — mount entire Antigravity config dir):**
-
-If you copy the entire Antigravity config dir structure, the proxy auto-detects `state.vscdb` at the default path — no env vars needed:
-
-```bash
-docker run -d --name zerogravity \
-  -p 8741:8741 -p 8742:8742 \
-  -v /path/to/Antigravity:/root/.config/Antigravity:ro \
-  ghcr.io/nikketryhard/zerogravity:latest
-```
-
-**Docker (manual path — single file mount):**
-
-```bash
-docker run -d --name zerogravity \
-  -p 8741:8741 -p 8742:8742 \
-  -v /path/to/state.vscdb:/authfile/state.vscdb:ro \
-  -e ZEROGRAVITY_STATE_DB=/authfile/state.vscdb \
-  ghcr.io/nikketryhard/zerogravity:latest
-```
-
-**Native (no Docker):**
-
-If Antigravity is installed on the same machine, it works automatically. Otherwise:
-
-```bash
-ZEROGRAVITY_STATE_DB=/path/to/state.vscdb ./zerogravity --headless
-```
-
-> **Note:** This is a one-time copy. The refresh token inside `state.vscdb` is long-lived — the proxy automatically uses it to obtain fresh access tokens. You only need to re-copy if you log out of Antigravity on the source machine.
-
-</details>
-
 ## Environment Variables
 
 | Variable                      | Default                 | Description                                                               |
 | ----------------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| `ZEROGRAVITY_TOKEN`           | —                       | OAuth token (`ya29.xxx`). Optional if `state.vscdb` is available          |
+| `ZEROGRAVITY_ACCOUNTS`        | —                       | Inline accounts: `email1:1//token1,email2:1//token2`                      |
+| `ZEROGRAVITY_TOKEN`           | —                       | Single OAuth access token (`ya29.xxx`) — expires in 60min                 |
 | `ZEROGRAVITY_API_KEY`         | —                       | Protect proxy from unauthorized access. Comma-separated for multiple keys |
-| `ZEROGRAVITY_STATE_DB`        | Auto-detected           | Path to Antigravity's `state.vscdb` for auto token refresh                |
-| `ZEROGRAVITY_UPSTREAM_PROXY`  | —                       | Upstream HTTPS proxy for outbound traffic (`http://proxy:8080`)           |
-| `ZEROGRAVITY_LS_PATH`         | Auto-detected           | Path to LS binary (set automatically in Docker)                           |
+| `ZEROGRAVITY_LS_PATH`         | Auto-detected           | Path to backend binary (set automatically in Docker)                      |
 | `ZEROGRAVITY_CONFIG_DIR`      | `~/.config/zerogravity` | Config directory                                                          |
-| `ZEROGRAVITY_DATA_DIR`        | `/tmp/.agcache`         | Standalone LS data directory                                              |
+| `ZEROGRAVITY_DATA_DIR`        | `/tmp/.agcache`         | Backend data directory                                                    |
 | `ZEROGRAVITY_APP_ROOT`        | Auto-detected           | Antigravity app root directory                                            |
-| `ZEROGRAVITY_LS_USER`         | `zerogravity-ls`        | System user for UID-scoped LS isolation (Linux)                           |
+| `ZEROGRAVITY_LS_USER`         | `zerogravity-ls`        | System user for process isolation (Linux)                                 |
 | `ZEROGRAVITY_MAX_RETRY_DELAY` | Internal default        | Max retry delay in seconds on rate limit errors                           |
 | `SSL_CERT_FILE`               | System default          | Custom CA certificate bundle path                                         |
 | `RUST_LOG`                    | `info`                  | Log level (`debug`, `info`, `warn`, `error`)                              |
 
 ## Docker Volumes
 
-| Host Path               | Container Path                 | Purpose                                                                                                            |
-| ----------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `~/.config/Antigravity` | `/root/.config/Antigravity:ro` | Auto-reads `state.vscdb` for token refresh. **Recommended** — enables auto-refresh without manual token management |
-
-> **Note:** Only one volume mount is needed. If Antigravity is not installed on the host, this mount is harmless (empty dir). You can also mount a single `state.vscdb` file — see [Auto-refresh with state.vscdb](#authentication) above.
+| Host Path         | Container Path                               | Purpose                          |
+| ----------------- | -------------------------------------------- | -------------------------------- |
+| `./accounts.json` | `/root/.config/zerogravity/accounts.json:ro` | Multi-account rotation (primary) |
 
 ## `zg` Commands
 
-| Command              | Description                                               |
-| -------------------- | --------------------------------------------------------- |
-| `zg init`            | First-run setup wizard (token, PATH, client hints)        |
-| `zg start`           | Start the proxy daemon                                    |
-| `zg stop`            | Stop the proxy daemon                                     |
-| `zg restart`         | Stop + start (no build/download)                          |
-| `zg update`          | Download latest release from GitHub (updates zg + binary) |
-| `zg status`          | Version, endpoints, quota, usage, and update check        |
-| `zg test [msg]`      | Quick test request (gemini-3-flash)                       |
-| `zg health`          | Health check                                              |
-| `zg token`           | Extract OAuth token from local Antigravity state.vscdb    |
-| `zg docker-init`     | Generate docker-compose.yml + .env in current dir         |
-| `zg logs [N]`        | Show last N lines (default 30)                            |
-| `zg logs-follow [N]` | Tail last N lines + follow                                |
-| `zg logs-all`        | Full log dump                                             |
+| Command              | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| `zg init`            | First-run setup wizard (token, PATH, client hints)         |
+| `zg start`           | Start the proxy daemon                                     |
+| `zg stop`            | Stop the proxy daemon                                      |
+| `zg restart`         | Stop + start (no build/download)                           |
+| `zg update`          | Download latest release from GitHub (updates zg + binary)  |
+| `zg status`          | Version, endpoints, quota, usage, and update check         |
+| `zg test [msg]`      | Quick test request (gemini-3-flash)                        |
+| `zg health`          | Health check                                               |
+| `zg token`           | Extract OAuth token from local Antigravity installation    |
+| `zg docker-init`     | Generate docker-compose.yml + accounts.json in current dir |
+| `zg logs [N]`        | Show last N lines (default 30)                             |
+| `zg logs-follow [N]` | Tail last N lines + follow                                 |
+| `zg logs-all`        | Full log dump                                              |
+
+### Accounts
+
+| Command                      | Description                                      |
+| ---------------------------- | ------------------------------------------------ |
+| `zg extract`                 | Extract account from Antigravity → accounts.json |
+| `zg accounts`                | List stored accounts                             |
+| `zg accounts set <email>`    | Set active account                               |
+| `zg accounts remove <email>` | Remove stored account                            |
 
 ### Diagnostics
 
