@@ -72,7 +72,7 @@ The proxy needs an OAuth token:
 2. **Token file**: `~/.config/zerogravity/token`
 3. **Runtime**: `curl -X POST http://localhost:8741/v1/token -d '{ "token": "ya29.xxx" }'`
 
-> **Docker users:** When you set a token via `/v1/token`, it's automatically pushed to the LS within 5 seconds — no container restart needed.
+> **Docker users:** When you set a token via `/v1/token`, it's automatically pushed to the backend within 5 seconds — no container restart needed.
 
 ### API Key Protection (Optional)
 
@@ -245,7 +245,7 @@ docker compose up -d
 docker compose up -d
 ```
 
-> **Note:** The Docker image bundles the LS binary — no Antigravity installation needed on the host. If Antigravity IS installed, mounting the config dir gives you automatic token refresh with no manual token management.
+> **Note:** The Docker image bundles all required backend components — no Antigravity installation needed on the host. If Antigravity IS installed, mounting the config dir gives you automatic token refresh with no manual token management.
 
 ## Endpoints
 
@@ -258,8 +258,8 @@ docker compose up -d
 | `GET/POST` | `/v1/search`                      | Web Search via Google grounding (WIP) |
 | `GET`      | `/v1/models`                      | List available models                 |
 | `POST`     | `/v1/token`                       | Set OAuth token at runtime            |
-| `GET`      | `/v1/usage`                       | MITM-intercepted token usage          |
-| `GET`      | `/v1/quota`                       | LS quota and rate limits              |
+| `GET`      | `/v1/usage`                       | Proxy token usage                     |
+| `GET`      | `/v1/quota`                       | Quota and rate limits                 |
 | `GET`      | `/health`                         | Health check                          |
 
 ## `zg` Commands
