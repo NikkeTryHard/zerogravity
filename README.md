@@ -126,7 +126,7 @@ The proxy uses **refresh tokens** for persistent authentication. Refresh tokens 
 
 ### Getting Refresh Tokens
 
-1. Install [Antigravity](https://github.com/NikkeTryHard/zerogravity) on your desktop
+1. Install [Antigravity](https://antigravity.google/download) on your desktop
 2. Login with your Google account
 3. Run `zg extract` — this copies the refresh token to `~/.config/zerogravity/accounts.json`
 
