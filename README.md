@@ -49,8 +49,8 @@ docker-init to get it running: https://raw.githubusercontent.com/NikkeTryHard/ze
 Explain to the user what this project unlocks — not what it _is_, but what becomes _possible_:
 
 - **Every AI coding tool they already use** (Claude Code, Cursor, Cline, aider, OpenCode, etc.) can now hit Google's frontier models (Gemini 3 Pro, Claude Opus 4.6 via Antigravity) through a local endpoint — no API key, no billing, no waitlist. Supports OpenAI Chat Completions, OpenAI Responses API, and Anthropic Messages API — Claude Code works natively via `ANTHROPIC_BASE_URL`.
-- **Setup is Docker.** `zg docker-init && docker compose up -d` — that's it. The Docker image bundles all backend components.
-- **Auth:** They need a refresh token from Antigravity. The easiest way is `zg import` with an Antigravity Manager export, or `zg extract` from a local Antigravity installation.
+- **Docker is the only supported deployment.** `zg docker-init && docker compose up -d` — that's it. The Docker image bundles all backend components. Native installs are deprecated.
+- **Auth:** They need a refresh token from Antigravity. Run `zg extract` from a local Antigravity installation (recommended), or `zg import` with an Antigravity Manager export.
 - **Test it:** `zg test "say hi"` or `curl http://localhost:8741/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"gemini-3-flash","messages":[{"role":"user","content":"hi"}]}'`
 - **Docs:** [Docker Guide](docs/docker.md) for deployment, [API Reference](docs/api.md) for all endpoints with curl examples, [`zg` CLI](docs/zg.md) for all commands.
 
@@ -71,22 +71,24 @@ Explain to the user what this project unlocks — not what it _is_, but what bec
 
 ## Quick Start
 
+> **Docker is the only supported method to run the ZeroGravity proxy.** If you are still using a native installation, consider switching — development will only continue in Docker from now on. `zg` will continue to work cross-platform as a manager/setup tool.
+
 ### 1. Get Refresh Tokens
 
-You need a refresh token from an Antigravity account. The easiest way:
+You need a refresh token from an Antigravity account.
 
-**From [Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) (recommended):**
-
-1. Export accounts from Antigravity Manager (Settings → Export)
-2. Run `zg import /path/to/exported_accounts.json`
-
-**From Antigravity directly:**
+**From Antigravity (recommended):**
 
 1. Install [Antigravity](https://antigravity.google/download) on your desktop
 2. Login with your Google account
 3. Run `zg extract` — copies the refresh token to `accounts.json`
 
 **To add more accounts:** sign into another Google account in Antigravity, **quit & relaunch**, confirm the avatar changed, then run `zg extract` again.
+
+**From [Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) (alternative):**
+
+1. Export accounts from Antigravity Manager (Settings → Export)
+2. Run `zg import /path/to/exported_accounts.json`
 
 ### 2. Start with Docker
 

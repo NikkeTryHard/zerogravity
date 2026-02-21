@@ -15,7 +15,7 @@ jobs:
       - name: Block source code directories
         run: |
           FAILED=0
-          for dir in src docs .cargo .config; do
+          for dir in src .cargo .config; do
             if [ -d "$dir" ]; then
               echo "::error::BLOCKED: '$dir/' directory found — source code must not be in this repo"
               FAILED=1
