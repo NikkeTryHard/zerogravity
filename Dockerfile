@@ -16,8 +16,10 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     -C /extract \
     --strip-components=0 \
     'Antigravity/resources/app/extensions/antigravity/bin/language_server_linux_x64' \
+    'Antigravity/resources/app/product.json' \
     && cp /extract/Antigravity/resources/app/extensions/antigravity/bin/language_server_linux_x64 /ls_binary \
     && chmod +x /ls_binary \
+    && mkdir -p /product && cp /extract/Antigravity/resources/app/product.json /product/ \
     && rm -rf /tmp/antigravity.tar.gz /extract/Antigravity; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
     curl -fsSL 'https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/1.18.3-4739469533380608/linux-arm/Antigravity.tar.gz' \
@@ -26,8 +28,10 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     -C /extract \
     --strip-components=0 \
     'Antigravity/resources/app/extensions/antigravity/bin/language_server_linux_arm' \
+    'Antigravity/resources/app/product.json' \
     && cp /extract/Antigravity/resources/app/extensions/antigravity/bin/language_server_linux_arm /ls_binary \
     && chmod +x /ls_binary \
+    && mkdir -p /product && cp /extract/Antigravity/resources/app/product.json /product/ \
     && rm -rf /tmp/antigravity.tar.gz /extract/Antigravity; \
     else \
     echo "Unsupported arch: $TARGETARCH" && exit 1; \
@@ -81,6 +85,9 @@ COPY --from=downloader /zg /usr/local/bin/zg
 
 # Copy backend binary
 COPY --from=ls-extractor /ls_binary /usr/local/bin/language_server_linux_x64
+
+# Copy product.json so version auto-detection works (find_install_dir checks this path)
+COPY --from=ls-extractor /product/product.json /usr/share/antigravity/resources/app/product.json
 
 # Setup directories
 RUN mkdir -p /root/.config/zerogravity \

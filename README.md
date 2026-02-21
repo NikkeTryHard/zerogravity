@@ -83,6 +83,7 @@ zg update
 | `DELETE`   | `/v1/accounts`                    | Remove account by email               |
 | `GET`      | `/v1/usage`                       | Proxy token usage                     |
 | `GET`      | `/v1/quota`                       | Quota and rate limits                 |
+| `GET`      | `/v1/images/*`                    | Serve generated images                |
 | `GET`      | `/health`                         | Health check                          |
 
 ## Setup
@@ -192,19 +193,35 @@ curl http://localhost:8741/v1/messages \
 
 ## Environment Variables
 
-| Variable                      | Default                 | Description                                                               |
-| ----------------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| `ZEROGRAVITY_ACCOUNTS`        | —                       | Inline accounts: `email1:1//token1,email2:1//token2`                      |
-| `ZEROGRAVITY_TOKEN`           | —                       | Single OAuth access token (`ya29.xxx`) — expires in 60min                 |
-| `ZEROGRAVITY_API_KEY`         | —                       | Protect proxy from unauthorized access. Comma-separated for multiple keys |
-| `ZEROGRAVITY_LS_PATH`         | Auto-detected           | Path to backend binary (set automatically in Docker)                      |
-| `ZEROGRAVITY_CONFIG_DIR`      | `~/.config/zerogravity` | Config directory                                                          |
-| `ZEROGRAVITY_DATA_DIR`        | `/tmp/.agcache`         | Backend data directory                                                    |
-| `ZEROGRAVITY_APP_ROOT`        | Auto-detected           | Antigravity app root directory                                            |
-| `ZEROGRAVITY_LS_USER`         | `zerogravity-ls`        | System user for process isolation (Linux)                                 |
-| `ZEROGRAVITY_MAX_RETRY_DELAY` | Internal default        | Max retry delay in seconds on rate limit errors                           |
-| `SSL_CERT_FILE`               | System default          | Custom CA certificate bundle path                                         |
-| `RUST_LOG`                    | `info`                  | Log level (`debug`, `info`, `warn`, `error`)                              |
+| Variable                      | Default                 | Description                                                                   |
+| ----------------------------- | ----------------------- | ----------------------------------------------------------------------------- |
+| `ZEROGRAVITY_ACCOUNTS`        | —                       | Inline accounts: `email1:1//token1,email2:1//token2`                          |
+| `ZEROGRAVITY_TOKEN`           | —                       | Single OAuth access token (`ya29.xxx`) — expires in 60min                     |
+| `ZEROGRAVITY_API_KEY`         | —                       | Protect proxy from unauthorized access. Comma-separated for multiple keys     |
+| `ZEROGRAVITY_UPSTREAM_PROXY`  | —                       | Route outbound traffic through a proxy (`http://`, `socks5://`, `socks5h://`) |
+| `ZEROGRAVITY_LS_PATH`         | Auto-detected           | Path to backend binary (set automatically in Docker)                          |
+| `ZEROGRAVITY_CONFIG_DIR`      | `~/.config/zerogravity` | Config directory                                                              |
+| `ZEROGRAVITY_DATA_DIR`        | `/tmp/.agcache`         | Backend data directory                                                        |
+| `ZEROGRAVITY_APP_ROOT`        | Auto-detected           | Antigravity app root directory                                                |
+| `ZEROGRAVITY_STATE_DB`        | Auto-detected           | Path to Antigravity's state database (for token extraction)                   |
+| `ZEROGRAVITY_LS_USER`         | `zerogravity-ls`        | System user for process isolation (Linux)                                     |
+| `ZEROGRAVITY_MACHINE_ID_PATH` | Auto-detected           | Path to Antigravity's machine ID file                                         |
+| `ZEROGRAVITY_CLIENT_VERSION`  | Auto-detected           | Override the client version string                                            |
+| `ZEROGRAVITY_MAX_RETRY_DELAY` | Internal default        | Max retry delay in seconds on rate limit errors                               |
+| `SSL_CERT_FILE`               | System default          | Custom CA certificate bundle path                                             |
+| `RUST_LOG`                    | `info`                  | Log level (`debug`, `info`, `warn`, `error`)                                  |
+
+### Request Queue
+
+Serializes generation requests to prevent thundering-herd failures when multiple clients hit the proxy simultaneously.
+
+| Variable                        | Default  | Description                                                |
+| ------------------------------- | -------- | ---------------------------------------------------------- |
+| `ZEROGRAVITY_QUEUE_ENABLED`     | `true`   | Set to `false`, `0`, or `no` to disable the queue entirely |
+| `ZEROGRAVITY_QUEUE_CONCURRENCY` | `1`      | Max concurrent requests to Google                          |
+| `ZEROGRAVITY_QUEUE_INTERVAL_MS` | `300`    | Anti-burst gap between consecutive requests (ms)           |
+| `ZEROGRAVITY_QUEUE_TIMEOUT_MS`  | `600000` | Max wait time in queue before HTTP 408                     |
+| `ZEROGRAVITY_QUEUE_MAX_SIZE`    | `50`     | Max queue depth; excess requests get HTTP 503              |
 
 ## Docker Volumes
 
@@ -214,42 +231,88 @@ curl http://localhost:8741/v1/messages \
 
 ## `zg` Commands
 
-| Command              | Description                                                |
-| -------------------- | ---------------------------------------------------------- |
-| `zg init`            | First-run setup wizard (token, PATH, client hints)         |
-| `zg start`           | Start the proxy daemon                                     |
-| `zg stop`            | Stop the proxy daemon                                      |
-| `zg restart`         | Stop + start (no build/download)                           |
-| `zg update`          | Download latest release from GitHub (updates zg + binary)  |
-| `zg status`          | Version, endpoints, quota, usage, and update check         |
-| `zg test [msg]`      | Quick test request (gemini-3-flash)                        |
-| `zg health`          | Health check                                               |
-| `zg token`           | Extract OAuth token from local Antigravity installation    |
-| `zg docker-init`     | Generate docker-compose.yml + accounts.json in current dir |
-| `zg logs [N]`        | Show last N lines (default 30)                             |
-| `zg logs-follow [N]` | Tail last N lines + follow                                 |
-| `zg logs-all`        | Full log dump                                              |
+`zg` is a standalone CLI tool that works on **any OS** (Linux, macOS, Windows). The proxy itself runs on Linux / Docker only.
 
-### Accounts
+### Standalone (works on any OS, no daemon needed)
 
-| Command                      | Description                                      |
-| ---------------------------- | ------------------------------------------------ |
-| `zg extract`                 | Extract account from Antigravity → accounts.json |
-| `zg accounts`                | List stored accounts                             |
-| `zg accounts set <email>`    | Set active account                               |
-| `zg accounts remove <email>` | Remove stored account                            |
+| Command                      | Description                                             |
+| ---------------------------- | ------------------------------------------------------- |
+| `zg extract`                 | Extract account from Antigravity → accounts.json        |
+| `zg import <file>`           | Import accounts from Antigravity Manager export         |
+| `zg accounts`                | List stored accounts                                    |
+| `zg accounts set <email>`    | Set active account                                      |
+| `zg accounts remove <email>` | Remove stored account                                   |
+| `zg token`                   | Extract OAuth token from local Antigravity installation |
+| `zg init`                    | First-run setup wizard (token, PATH, client hints)      |
+| `zg docker-init`             | Generate docker-compose.yml + accounts.json template    |
+| `zg update`                  | Download latest zg binary from GitHub                   |
 
-### Diagnostics
+### Daemon (requires running proxy — Linux / Docker)
 
-| Command            | Description                                        |
-| ------------------ | -------------------------------------------------- |
-| `zg report`        | Generate full diagnostic report for bug reports    |
-| `zg report <id>`   | Bundle a specific trace into a shareable `.tar.gz` |
-| `zg replay <file>` | Re-send a bundled trace to the local proxy         |
-| `zg trace`         | Show latest trace summary                          |
-| `zg trace ls`      | List last 10 traces                                |
-| `zg trace dir`     | Print trace base directory                         |
-| `zg trace errors`  | Show today's error traces                          |
+| Command              | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `zg start`           | Start the proxy daemon                             |
+| `zg stop`            | Stop the proxy daemon                              |
+| `zg restart`         | Stop + start (no build/download)                   |
+| `zg status`          | Version, endpoints, quota, usage, and update check |
+| `zg logs [N]`        | Show last N lines (default 30)                     |
+| `zg logs-follow [N]` | Tail last N lines + follow                         |
+| `zg logs-all`        | Full log dump                                      |
+| `zg test [msg]`      | Quick test request (gemini-3-flash)                |
+| `zg health`          | Health check                                       |
+| `zg report`          | Generate full diagnostic report for bug reports    |
+| `zg report <id>`     | Bundle a specific trace into a shareable `.tar.gz` |
+| `zg replay <file>`   | Re-send a bundled trace to the local proxy         |
+| `zg trace`           | Show latest trace summary                          |
+| `zg trace ls`        | List last 10 traces                                |
+| `zg trace dir`       | Print trace base directory                         |
+| `zg trace errors`    | Show today's error traces                          |
+
+## `accounts.json` Schema
+
+The proxy reads accounts from `~/.config/zerogravity/accounts.json`:
+
+```json
+{
+  "accounts": [
+    {
+      "email": "user@gmail.com",
+      "refresh_token": "1//0fXXXXXXXXXX",
+      "extracted_at": "2026-02-21T05:08:32Z"
+    }
+  ],
+  "active": "user@gmail.com"
+}
+```
+
+| Field           | Required | Description                                             |
+| --------------- | -------- | ------------------------------------------------------- |
+| `email`         | Yes      | Google account email                                    |
+| `refresh_token` | Yes      | OAuth refresh token (starts with `1//`)                 |
+| `alias`         | No       | Friendly alias for the account                          |
+| `extracted_at`  | No       | ISO 8601 timestamp of when the account was added        |
+| `active`        | No       | Email of the currently active account (top-level field) |
+
+### Importing from Antigravity Manager
+
+[Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) exports accounts as a flat JSON array:
+
+```json
+[
+  { "email": "user@gmail.com", "refresh_token": "1//0fXXX" },
+  { "email": "user2@gmail.com", "refresh_token": "1//0fYYY" }
+]
+```
+
+**With `zg` (recommended):**
+
+```bash
+zg import /path/to/antigravity_accounts.json
+```
+
+This auto-detects the format, converts it, and merges into your existing `accounts.json`.
+
+**Manual conversion:** Wrap the array in the schema above — add `"accounts":` around it and optionally set `"active"` to the first email. You can create `accounts.json` by hand without needing `zg` at all.
 
 ## License
 
