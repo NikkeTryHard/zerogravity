@@ -129,7 +129,9 @@ http://localhost:8741/v1beta
 ```
 
 > [!TIP]
-> If you're running Docker and accessing the proxy from the host machine, `localhost` works as-is. For access from other containers, use the service name (e.g. `zerogravity`) instead.
+> **From your host machine:** `localhost:8741` works as-is (port is mapped in docker-compose).
+> **From another container** in the same compose: use `zerogravity:8741` (the service name).
+> **From a remote machine:** use `<host-ip>:8741`.
 
 <details>
 <summary>OpenCode configuration template</summary>
