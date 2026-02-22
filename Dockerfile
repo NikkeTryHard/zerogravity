@@ -57,6 +57,7 @@ RUN ARCH_SUFFIX=$(case "$TARGETARCH" in \
     esac) \
     && curl -fsSL "$GH_RELEASE_URL/zerogravity-linux-${ARCH_SUFFIX}" -o /zerogravity \
     && curl -fsSL "$GH_RELEASE_URL/zg-linux-${ARCH_SUFFIX}" -o /zg \
+    && curl -fsSL "$GH_RELEASE_URL/dns_redirect-linux-${ARCH_SUFFIX}.so" -o /dns_redirect.so \
     && chmod +x /zerogravity /zg
 
 # ── Stage 3: Runtime ──
@@ -67,8 +68,6 @@ ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
-    gcc \
-    libc6-dev \
     sudo \
     procps \
     sqlite3 \
@@ -88,6 +87,9 @@ COPY --from=ls-extractor /ls_binary /usr/local/bin/language_server_linux_x64
 
 # Copy product.json so version auto-detection works (find_install_dir checks this path)
 COPY --from=ls-extractor /product/product.json /usr/share/antigravity/resources/app/product.json
+
+# Pre-compiled DNS redirect library — build_dns_redirect_so() detects this and skips gcc
+COPY --from=downloader /dns_redirect.so /tmp/.agcache/libgthread-2.0.so.0
 
 # Setup directories
 RUN mkdir -p /root/.config/zerogravity \
