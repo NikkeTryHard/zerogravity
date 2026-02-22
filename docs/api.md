@@ -106,14 +106,19 @@ curl -X DELETE http://localhost:8741/v1/accounts \
 
 ### Account Rotation
 
-When running with 2+ accounts, the proxy **automatically rotates** to the next account when Google returns `RESOURCE_EXHAUSTED` (429). The rotation:
+When running with 2+ accounts, the proxy **automatically rotates** to the next account when:
 
-- Waits a short cooldown (5–10s)
+- Google returns `RESOURCE_EXHAUSTED` (429) — after 3 consecutive failures
+- Google returns `PERMISSION_DENIED` (403) — **immediate** rotation (no consecutive threshold)
+
+The rotation:
+
+- Waits a short cooldown (5–10s with jitter)
 - Refreshes the next account's access token via OAuth
 - Restarts the backend to get a clean session
 - Clears all rate limiter state
 
-Use `--quota-cap 0.2` (default) to rotate proactively when any model exceeds 80% usage. When all accounts are exhausted, the proxy parks and waits for quota to reset. Set to `0` to disable proactive rotation.
+Use `--quota-cap 0.2` (default) or set `ZEROGRAVITY_QUOTA_CAP=0.2` to rotate proactively when any model exceeds 80% usage. When all accounts are exhausted, the proxy parks and waits for quota to reset. Set to `0` to disable proactive rotation.
 
 ## Token Management
 

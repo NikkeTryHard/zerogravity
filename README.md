@@ -311,6 +311,19 @@ The proxy reads accounts from `~/.config/zerogravity/accounts.json`:
 | `extracted_at`  | No       | ISO 8601 timestamp of when the account was added        |
 | `active`        | No       | Email of the currently active account (top-level field) |
 
+## Customization
+
+| Variable                      | Default       | Description                                                                                                                                 |
+| ----------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ZEROGRAVITY_SYSTEM_MODE`     | `stealth`     | `stealth` = keep backend prompt, inject user system prompt as override; `minimal` = replace 20KB prompt with minimal identity + user prompt |
+| `ZEROGRAVITY_SENSITIVE_WORDS` | built-in list | Comma-separated client names to obfuscate in requests (zero-width spaces), or `none` to disable                                             |
+
+**System prompt mode:** When your client sends a system prompt (e.g. via OpenAI `system` role), ZeroGravity injects it into the request. In `stealth` mode, the backend's identity is stripped and your prompt takes over. In `minimal` mode, the entire 20KB backend prompt is replaced — saves tokens but may trigger rate limiting on Pro models.
+
+**Sensitive word obfuscation:** Client names like OpenCode, Cursor, Claude Code are automatically obfuscated with invisible characters so Google can't grep for them in request logs.
+
+See the [Docker Guide](docs/docker.md) for the full environment variable reference.
+
 ## Documentation
 
 | Doc                              | What's in it                                                 |

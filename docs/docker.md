@@ -80,6 +80,14 @@ docker run -d --name zerogravity \
 | `SSL_CERT_FILE`               | System default          | Custom CA certificate bundle path                                             |
 | `RUST_LOG`                    | `info`                  | Log level (`debug`, `info`, `warn`, `error`)                                  |
 
+### Customization
+
+| Variable                      | Default   | Description                                                                         |
+| ----------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| `ZEROGRAVITY_QUOTA_CAP`       | `0.2`     | Per-account quota usage cap (0.0–1.0), triggers rotation. `0` to disable            |
+| `ZEROGRAVITY_SYSTEM_MODE`     | `stealth` | `stealth` = keep backend prompt, inject user override; `minimal` = replace entirely |
+| `ZEROGRAVITY_SENSITIVE_WORDS` | built-in  | Comma-separated client names to obfuscate, or `none` to disable                     |
+
 ### Request Queue
 
 Serializes generation requests to prevent thundering-herd failures when multiple clients hit the proxy simultaneously.
