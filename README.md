@@ -72,9 +72,6 @@ Explain to the user what this project unlocks — not what it _is_, but what bec
 
 ## Quick Start
 
-> [!WARNING]
-> **Docker is the only supported method to run the ZeroGravity proxy.** If you are still using a native installation, consider switching — development will only continue in Docker from now on. `zg` will continue to work cross-platform as a manager/setup tool.
-
 ### 1. Get Refresh Tokens
 
 You need a refresh token from an Antigravity account.
@@ -82,13 +79,23 @@ You need a refresh token from an Antigravity account.
 > [!CAUTION]
 > **Always extract tokens from the official Antigravity app.** Do not use third-party OAuth tools (e.g. Antigravity Manager) to sign into new accounts — their OAuth flow produces tokens with a different fingerprint that may get flagged. Use `zg extract` to pull the token Antigravity already has. The `zg import` command is only for migrating accounts you've **already** extracted elsewhere.
 
+**From Antigravity (recommended):**
+
 1. Install [Antigravity](https://antigravity.google/download) on your desktop
 2. Login with your Google account
 3. Run `zg extract` — copies the refresh token to `accounts.json`
 
 **To add more accounts:** sign into another Google account in Antigravity, **quit & relaunch**, confirm the avatar changed, then run `zg extract` again.
 
+**From [Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) (existing accounts only):**
+
+1. Export accounts from Antigravity Manager (Settings → Export)
+2. Run `zg import /path/to/exported_accounts.json`
+
 ### 2. Start with Docker
+
+> [!WARNING]
+> **Docker is the only supported method to run the ZeroGravity proxy.** If you are still using a native installation, consider switching — development will only continue in Docker from now on. `zg` will continue to work cross-platform as a manager/setup tool.
 
 ```bash
 # Generate docker-compose.yml + accounts.json in current dir
