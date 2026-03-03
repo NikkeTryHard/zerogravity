@@ -1,7 +1,7 @@
 # API Reference
 
 - **Status**: Active
-- **Last validated**: 2026-02-28
+- **Last validated**: 2026-03-03
 - **Related docs**: [`README.md`](README.md), [`docker.md`](docker.md), [`zg.md`](zg.md), [`../index.md`](../index.md)
 
 The proxy runs on `http://localhost:8741` by default.

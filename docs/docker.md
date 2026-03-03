@@ -1,7 +1,7 @@
 # Docker Guide
 
 - **Status**: Active
-- **Last validated**: 2026-02-28
+- **Last validated**: 2026-03-03
 - **Related docs**: [`README.md`](README.md), [`api.md`](api.md), [`zg.md`](zg.md), [`../index.md`](../index.md)
 
 The proxy runs as a Docker container. The image bundles all required backend components — no Antigravity installation needed on the host.

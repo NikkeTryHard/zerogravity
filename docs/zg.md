@@ -1,7 +1,7 @@
 # `zg` CLI Reference
 
 - **Status**: Active
-- **Last validated**: 2026-02-28
+- **Last validated**: 2026-03-03
 - **Related docs**: [`README.md`](README.md), [`docker.md`](docker.md), [`api.md`](api.md), [`../index.md`](../index.md)
 
 `zg` is a standalone CLI tool that works on **any OS** (Linux, macOS, Windows). The proxy itself runs on Linux/Docker only.

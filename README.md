@@ -163,11 +163,11 @@ Add to your global config (`~/.config/opencode/opencode.json`) or project config
       "models": {
         "gemini-3-flash": {
           "name": "Gemini 3 Flash",
-          "limit": { "context": 128000, "output": 65536 },
+          "limit": { "context": 1048576, "output": 65536 },
         },
-        "gemini-3-pro": {
-          "name": "Gemini 3 Pro",
-          "limit": { "context": 128000, "output": 65536 },
+        "gemini-3.1-pro": {
+          "name": "Gemini 3.1 Pro",
+          "limit": { "context": 1048576, "output": 65536 },
         },
       },
     },
@@ -192,11 +192,16 @@ Add to your global config (`~/.config/opencode/opencode.json`) or project config
       "models": {
         "gemini-3-flash": {
           "name": "Gemini 3 Flash",
-          "limit": { "context": 128000, "output": 65536 },
+          "limit": { "context": 1048576, "output": 65536 },
         },
         "opus-4.6": {
           "name": "Claude Opus 4.6",
-          "limit": { "context": 200000, "output": 16000 },
+          "limit": { "context": 200000, "output": 65536 },
+          "thinking": { "type": "adaptive" },
+        },
+        "sonnet-4.6": {
+          "name": "Claude Sonnet 4.6",
+          "limit": { "context": 200000, "output": 65536 },
           "thinking": { "type": "adaptive" },
         },
       },
