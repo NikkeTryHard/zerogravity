@@ -23,9 +23,11 @@ These work on any OS without a running proxy.
 | `zg init`                    | First-run setup wizard (token, PATH, client hints)    |
 | `zg extract`                 | Extract account from Antigravity → accounts.json      |
 | `zg import <file>`           | Import accounts from Antigravity Manager export       |
-| `zg accounts`                | List stored accounts                                  |
+| `zg accounts`                 | List stored accounts                                  |
 | `zg accounts set <email>`    | Set active account                                    |
 | `zg accounts remove <email>` | Remove stored account                                 |
+| `zg accounts disable <email>` | Exclude account from rotation                        |
+| `zg accounts enable <email>` | Re-enable account for rotation                        |
 | `zg token`                   | Show OAuth tokens (access + refresh) from Antigravity |
 | `zg fingerprint`             | Print device-fingerprint + IDE version env hints      |
 | `zg docker-init`             | Generate docker-compose.yml + accounts.json template  |

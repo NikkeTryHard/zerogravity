@@ -342,3 +342,8 @@ OpenAI and Anthropic tool/function declarations are translated to Gemini's forma
 - **Non-standard keys** (`strict`, `x-*` prefixed, etc.) are stripped before sending to Gemini
 
 Gemini-native tool declarations (via `/v1beta/`) pass through with zero translation.
+
+### Request Validation
+
+- Missing `model` field returns HTTP 400 (previously had a silent default)
+- Tool names exceeding 128 characters are rejected with HTTP 400
