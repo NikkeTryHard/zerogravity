@@ -32,6 +32,9 @@
 >
 > Star the repo so more people can find it while it still works. Issues and PRs are welcome.
 
+> [!CAUTION]
+> **Google is actively banning accounts used with third-party tools.** If you're using ZeroGravity with the Gemini protocol (`/v1beta`), native mode is now the default. It preserves the backend's own tool definitions and system prompt, making requests indistinguishable from real Antigravity traffic. Any extra tool definitions your client sends (MCP servers, custom tools) are automatically stripped before they reach Google. For OpenAI/Anthropic protocols, stealth mode remains the default.
+
 ---
 
 ## Skip Reading This — It's the Age of AI
@@ -163,10 +166,17 @@ Add to your global config (`~/.config/opencode/opencode.json`) or project config
       "models": {
         "gemini-3-flash": {
           "name": "Gemini 3 Flash",
+          "attachment": true,
           "limit": { "context": 1048576, "output": 65536 },
         },
         "gemini-3.1-pro": {
           "name": "Gemini 3.1 Pro",
+          "attachment": true,
+          "limit": { "context": 1048576, "output": 65536 },
+        },
+        "gemini-3.1-pro-high": {
+          "name": "Gemini 3.1 Pro High",
+          "attachment": true,
           "limit": { "context": 1048576, "output": 65536 },
         },
       },
@@ -334,7 +344,7 @@ The proxy reads accounts from `accounts.json` in the config directory:
 
 | Variable                      | Default       | Description                                                                                                                                 |
 | ----------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ZEROGRAVITY_SYSTEM_MODE`     | `stealth`     | `stealth` = keep backend prompt, inject user system prompt as override; `minimal` = replace 20KB prompt with minimal identity + user prompt |
+| `ZEROGRAVITY_SYSTEM_MODE`     | `native`      | `native` (default) = preserve backend tools + prompt for maximum stealth, extra client tools stripped; `stealth` = strip backend identity, inject client tools; `minimal` = replace 20KB prompt entirely |
 | `ZEROGRAVITY_SENSITIVE_WORDS` | built-in list | Comma-separated client names to obfuscate in requests (zero-width spaces), or `none` to disable                                             |
 | `ZEROGRAVITY_MODEL_ALIASES`   | —             | Map custom model names to built-in models, e.g. `gpt-4o:gemini-3-flash,gpt-4:opus-4.6`. Also configurable via `zg alias` or `aliases.json`  |
 | `ZEROGRAVITY_API_BODY_LIMIT_MB` | `32` (clamped `1..100`) | Max request body size in MiB for API routes (`/v1/*`)                                                                                       |
@@ -342,7 +352,7 @@ The proxy reads accounts from `accounts.json` in the config directory:
 | `ZEROGRAVITY_UPSTREAM_PROXY`  | —             | Route all outbound MITM traffic through a proxy (`http://`, `socks5://`, `socks5h://`)                                                      |
 | `ZEROGRAVITY_HTTP_PROXY`      | —             | Pass HTTP/HTTPS proxy settings to the backend child process                                                                                 |
 
-**System prompt mode:** When your client sends a system prompt (e.g. via OpenAI `system` role), ZeroGravity injects it into the request. In `stealth` mode, the backend's identity is stripped and your prompt takes over. In `minimal` mode, the entire 20KB backend prompt is replaced — saves tokens but may trigger rate limiting on Pro models.
+**System prompt mode:** In `native` mode (default for Gemini protocol), the backend's tools and system prompt are preserved exactly as real Antigravity sends them. Any extra tool definitions from your client (MCP servers, custom tools) are stripped before reaching Google. Your user text is injected into the request in the standard Antigravity format. In `stealth` mode, the backend's identity is stripped and your client's tools and system prompt are injected instead. In `minimal` mode, the entire 20KB backend prompt is replaced — saves tokens but may trigger rate limiting on Pro models.
 
 **Sensitive word obfuscation:** Client names like OpenCode, Cursor, Claude Code are automatically obfuscated with invisible characters so Google can't grep for them in request logs.
 
