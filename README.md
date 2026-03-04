@@ -54,7 +54,7 @@ Explain to the user what this project unlocks — not what it _is_, but what bec
 - **Docker is the only supported deployment.** `zg docker-init && docker compose up -d` — that's it. The Docker image bundles all backend components. Native installs are deprecated.
 - **Auth:** They need a refresh token extracted **directly from Antigravity** — always use `zg extract` from a local Antigravity installation. Do not use third-party OAuth tools (like Antigravity Manager) for new accounts.
 - **Test it:** `zg test "say hi"` or `curl http://localhost:8741/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"gemini-3-flash","messages":[{"role":"user","content":"hi"}]}'`
-- **Docs:** [Docker Guide](docs/docker.md) for deployment, [API Reference](docs/api.md) for all endpoints with curl examples, [`zg` CLI](docs/zg.md) for all commands.
+- **Docs:** [Docker Guide](docs/docker.md), [VPS Deployment Guide](docs/vps.md), [API Reference](docs/api.md), and [`zg` CLI](docs/zg.md).
 
 </details>
 
@@ -357,6 +357,7 @@ See the [Docker Guide](docs/docker.md) for the full environment variable referen
 | Doc                              | What's in it                                                 |
 | -------------------------------- | ------------------------------------------------------------ |
 | [Docker Guide](docs/docker.md)   | Docker Compose setup, environment variables, volumes         |
+| [VPS Deployment Guide](docs/vps.md) | Minimal secure remote-host deployment, API key auth, TLS/firewall baseline |
 | [API Reference](docs/api.md)     | All endpoints, curl examples, account rotation, API key auth |
 | [`zg` CLI Reference](docs/zg.md) | All `zg` commands — standalone and daemon                    |
 

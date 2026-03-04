@@ -2,9 +2,11 @@
 
 - **Status**: Active
 - **Last validated**: 2026-03-03
-- **Related docs**: [`README.md`](README.md), [`docker.md`](docker.md), [`zg.md`](zg.md), [`../index.md`](../index.md)
+- **Related docs**: [`README.md`](README.md), [`clients.md`](clients.md), [`docker.md`](docker.md), [`zg.md`](zg.md), [`../index.md`](../index.md)
 
 The proxy runs on `http://localhost:8741` by default.
+
+For cross-client operational guidance (Claude Code, OpenCode, OpenAI-compatible, Anthropic-compatible), see the [Client Operations Guide](clients.md).
 
 ## Protocol Endpoints
 
