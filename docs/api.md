@@ -154,7 +154,7 @@ The rotation:
 - Restarts the backend to get a clean session
 - Resets cooldown windows while preserving exhaustion counters
 
-Use `--quota-cap 0.2` (default) or set `ZEROGRAVITY_QUOTA_CAP=0.2` to rotate proactively when any model exceeds 80% usage. When all accounts are exhausted, the proxy parks and waits for quota to reset. Set to `0` to disable proactive rotation.
+Use `--quota-cap 0.2` (default) or set `ZEROGRAVITY_QUOTA_CAP=0.2` to rotate proactively when any model exceeds 20% usage (i.e., remaining quota drops below 80%). When all accounts are exhausted, the proxy parks and waits for quota to reset. Set to `0` to disable proactive rotation.
 
 ## Token Management
 
