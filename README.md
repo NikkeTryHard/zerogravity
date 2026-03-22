@@ -12,7 +12,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-555?style=flat-square" alt="Platform" />
   <img src="https://img.shields.io/badge/license-MIT-333?style=flat-square" alt="License" />
-  <img src="https://img.shields.io/badge/API-OpenAI%20%7C%20Anthropic%20%7C%20Gemini-666?style=flat-square" alt="API" />
+  <img src="https://img.shields.io/github/v/release/NikkeTryHard/zerogravity?display_name=release&sort=semver&style=flat-square&label=stable" alt="Stable" />
+  <img src="https://img.shields.io/badge/API-Gemini%20%7C%20OpenAI%20%7C%20Anthropic-666?style=flat-square" alt="API" />
   <img src="https://img.shields.io/github/downloads/NikkeTryHard/zerogravity/total?style=flat-square&label=downloads&color=555" alt="Downloads" />
 </p>
 
@@ -23,7 +24,7 @@
 </p>
 
 <p align="center">
-  OpenAI, Anthropic, and Gemini-compatible proxy that looks like real Antigravity traffic to Google.
+  Gemini-native proxy with OpenAI- and Anthropic-compatible surfaces that looks like real Antigravity traffic to Google.
 </p>
 
 > **Early stage.** Ran this on OpenCode with an Ultra account for 3 days straight, stress testing the whole time. No issues so far.
@@ -33,6 +34,51 @@
 > Star the repo so more people can find it while it still works. Issues and PRs are welcome.
 
 ---
+
+## Roadmap Progress
+
+The project is moving through a phased v2.0.0 roadmap. The short version is:
+the Docker-first native runtime foundation is in place, the main auth/runtime
+bring-up work is in place, and the remaining work is mostly about closing the
+gap between "works well" and "matches real Antigravity behavior as closely as
+possible."
+
+### Phase Status
+
+| Phase | Area | Status |
+| ----- | ---- | ------ |
+| Phase 0 | Foundations / native-first baseline | Completed |
+| Phase 1 | Real Antigravity runtime in Docker | Completed |
+| Phase 2 | Hook points and token swap path | Completed |
+| Phase 3 | Session continuity, tools, and context | Completed |
+| Phase 4 | Real account active from boot | Completed |
+| Phase 5 | Observability and hardening baseline | Completed |
+| Phase 6 | Scaling groundwork | Completed |
+| Phase 7 | Native prompt pipeline | In progress |
+| Phase 8 | Native auth / project / metadata ownership | In progress |
+| Phase 9 | Telemetry and integrity policy cleanup | Planned |
+| Phase 10 | Transport boundary minimization | Planned |
+| Phase 11 | Final parity proof and release gate | Planned |
+
+### Subtask Snapshot
+
+- Completed:
+  - Docker is the supported runtime.
+  - Real Antigravity runtime flow is working.
+  - Early auth/runtime bring-up and session continuity are in place.
+  - Basic hardening and operator-facing diagnostics are in place.
+- In progress:
+  - Finishing the native prompt path across more request shapes.
+  - Reducing remaining compatibility glue so more behavior is owned natively.
+  - Tightening docs, validation, and release-readiness for the v2.0.0 line.
+- Planned:
+  - Additional telemetry/integrity cleanup.
+  - Further shrinking the transport boundary.
+  - Final end-to-end parity and release sign-off.
+
+This section is intentionally high-level. The public repo tracks what is shipped,
+what is being polished, and what is still ahead without going into private
+implementation details.
 
 ## Skip Reading This — It's the Age of AI
 
@@ -54,7 +100,7 @@ Explain to the user what this project unlocks — not what it _is_, but what bec
 - **Docker is the only supported deployment.** `zg docker-init && docker compose up -d` — that's it. The Docker image bundles all backend components. Native installs are deprecated.
 - **Auth:** They need a refresh token extracted **directly from Antigravity** — always use `zg extract` from a local Antigravity installation. Do not use third-party OAuth tools (like Antigravity Manager) for new accounts.
 - **Test it:** `zg test "say hi"` or `curl http://localhost:8741/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"gemini-3-flash","messages":[{"role":"user","content":"hi"}]}'`
-- **Docs:** [Docker Guide](docs/docker.md), [VPS Deployment Guide](docs/vps.md), [API Reference](docs/api.md), and [`zg` CLI](docs/zg.md).
+- **Docs:** [Docker Guide](docs/docker.md), [VPS Deployment Guide](docs/vps.md), [API Reference](docs/api.md), [Client Operations Guide](docs/clients.md), and [`zg` CLI](docs/zg.md).
 
 </details>
 
@@ -64,9 +110,9 @@ Explain to the user what this project unlocks — not what it _is_, but what bec
 
 | Name                  | Label                           | Notes               |
 | --------------------- | ------------------------------- | ------------------- |
-| `opus-4.6`            | Claude Opus 4.6 (Thinking)      | Default model       |
+| `gemini-3-flash`      | Gemini 3 Flash                  | Default model       |
 | `sonnet-4.6`          | Claude Sonnet 4.6 (Thinking)    | —                   |
-| `gemini-3-flash`      | Gemini 3 Flash                  | Recommended for dev |
+| `opus-4.6`            | Claude Opus 4.6 (Thinking)      | Compatibility alias |
 | `gemini-3.1-pro`      | Gemini 3.1 Pro (High)           | Experimental        |
 | `gemini-3.1-pro-high` | Gemini 3.1 Pro (High)           | Alias               |
 | `gemini-3.1-pro-low`  | Gemini 3.1 Pro (Low)            | Experimental        |
@@ -87,7 +133,7 @@ You need a refresh token from an Antigravity account.
 2. Login with your Google account
 3. Run `zg extract` — copies the refresh token to `accounts.json` (Linux: `~/.config/zerogravity/`, macOS: `~/Library/Application Support/zerogravity/`, Windows: `%APPDATA%\zerogravity\`)
 
-**To add more accounts:** sign into another Google account in Antigravity, **quit & relaunch**, confirm the avatar changed, then run `zg extract` again.
+**Preferred operator model:** start with one real account per container. If you need more throughput later, run another container with another account instead of treating multi-account rotation as the default path.
 
 **From [Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) (existing accounts only):**
 
@@ -342,7 +388,7 @@ The proxy reads accounts from `accounts.json` in the config directory:
 | `ZEROGRAVITY_SENSITIVE_WORDS` | built-in list | Comma-separated client names to obfuscate in requests (zero-width spaces), or `none` to disable                                             |
 | `ZEROGRAVITY_MODEL_ALIASES`   | —             | Map custom model names to built-in models, e.g. `gpt-4o:gemini-3-flash,gpt-4:opus-4.6`. Also configurable via `zg alias` or `aliases.json`  |
 | `ZEROGRAVITY_API_BODY_LIMIT_MB` | `32` (clamped `1..100`) | Max request body size in MiB for API routes (`/v1/*`)                                                                                       |
-| `ZEROGRAVITY_QUOTA_CAP`       | `0.2`         | Per-account quota usage cap (0.0-1.0), triggers rotation. `0` to disable. Also available as `--quota-cap` CLI flag                          |
+| `ZEROGRAVITY_QUOTA_CAP`       | `0.2`         | Advanced compatibility knob for quota-triggered account rotation inside one deployment. `0` disables that behavior. Also available as `--quota-cap` CLI flag |
 | `ZEROGRAVITY_UPSTREAM_PROXY`  | —             | Route all outbound MITM traffic through a proxy (`http://`, `socks5://`, `socks5h://`)                                                      |
 | `ZEROGRAVITY_HTTP_PROXY`      | —             | Pass HTTP/HTTPS proxy settings to the backend child process                                                                                 |
 
@@ -358,7 +404,8 @@ See the [Docker Guide](docs/docker.md) for the full environment variable referen
 | -------------------------------- | ------------------------------------------------------------ |
 | [Docker Guide](docs/docker.md)   | Docker Compose setup, environment variables, volumes         |
 | [VPS Deployment Guide](docs/vps.md) | Minimal secure remote-host deployment, API key auth, TLS/firewall baseline |
-| [API Reference](docs/api.md)     | All endpoints, curl examples, account rotation, API key auth |
+| [API Reference](docs/api.md)     | All endpoints, curl examples, compatibility account controls, API key auth |
+| [Client Operations Guide](docs/clients.md) | Client-specific behavior, defaults, and troubleshooting |
 | [`zg` CLI Reference](docs/zg.md) | All `zg` commands — standalone and daemon                    |
 
 ## License
