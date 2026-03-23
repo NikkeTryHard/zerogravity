@@ -54,7 +54,7 @@ possible."
 | Phase 4 | Real account active from boot | Completed |
 | Phase 5 | Observability and hardening baseline | Completed |
 | Phase 6 | Scaling groundwork | Completed |
-| Phase 7 | Native prompt pipeline | In progress |
+| Phase 7 | Native prompt pipeline | Completed |
 | Phase 8 | Native auth / project / metadata ownership | In progress |
 | Phase 9 | Telemetry and integrity policy cleanup | Planned |
 | Phase 10 | Transport boundary minimization | Planned |
@@ -67,9 +67,9 @@ possible."
   - Real Antigravity runtime flow is working.
   - Early auth/runtime bring-up and session continuity are in place.
   - Basic hardening and operator-facing diagnostics are in place.
+  - The shipped native prompt path is in place across the public request surfaces.
 - In progress:
-  - Finishing the native prompt path across more request shapes.
-  - Reducing remaining compatibility glue so more behavior is owned natively.
+  - Reducing remaining compatibility glue so more auth, project, and metadata behavior is owned natively.
   - Tightening docs, validation, and release-readiness for the v2.0.0 line.
 - Planned:
   - Additional telemetry/integrity cleanup.
