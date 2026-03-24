@@ -55,8 +55,8 @@ possible."
 | Phase 5 | Observability and hardening baseline | Completed |
 | Phase 6 | Scaling groundwork | Completed |
 | Phase 7 | Native prompt pipeline | Completed |
-| Phase 8 | Native auth / project / metadata ownership | In progress |
-| Phase 9 | Telemetry and integrity policy cleanup | Planned |
+| Phase 8 | Native auth / project / metadata ownership | Completed |
+| Phase 9 | Telemetry and integrity policy cleanup | In progress |
 | Phase 10 | Transport boundary minimization | Planned |
 | Phase 11 | Final parity proof and release gate | Planned |
 
@@ -68,12 +68,11 @@ possible."
   - Early auth/runtime bring-up and session continuity are in place.
   - Basic hardening and operator-facing diagnostics are in place.
   - The shipped native prompt path is in place across the public request surfaces.
+  - The shipped native lane now owns auth, project, and request-metadata behavior without depending on proxy-side repair as the steady-state story.
 - In progress:
-  - Reducing remaining compatibility glue so more auth, project, and metadata behavior is owned natively.
-  - Tightening docs, validation, and release-readiness for the v2.0.0 line.
-- Planned:
   - Additional telemetry/integrity cleanup.
   - Further shrinking the transport boundary.
+- Planned:
   - Final end-to-end parity and release sign-off.
 
 This section is intentionally high-level. The public repo tracks what is shipped,

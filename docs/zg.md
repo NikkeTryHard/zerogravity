@@ -54,11 +54,11 @@ without a live proxy and reports reachability/status details.
 | `zg start`         | Start the proxy daemon                             |
 | `zg stop`          | Stop the proxy daemon                              |
 | `zg restart`       | Stop + start (no build/download)                   |
-| `zg status`        | Version, endpoints, quota, usage, and update check |
-| `zg test [msg]`    | Quick test request (gemini-3.1-pro)                |
-| `zg health`        | Health check                                       |
-| `zg smoke`         | Run comprehensive smoke tests (all endpoints)      |
-| `zg smoke --quick` | Quick smoke test (skip streaming/tools)            |
+| `zg status [--port N]`        | Version, endpoints, quota, usage, and update check for the selected local runtime |
+| `zg test [--port N] [msg]`    | Quick test request (gemini-3.1-pro) against the selected local runtime             |
+| `zg health [--port N]`        | Health check for the selected local runtime                                        |
+| `zg smoke [--port N]`         | Run comprehensive smoke tests against the selected local runtime                   |
+| `zg smoke [--port N] --quick` | Quick smoke test (skip streaming/tools)                                            |
 
 ### Logs
 
@@ -92,7 +92,7 @@ Supported subcommands are exactly: `ls`, `dir`, `errors`.
 
 | Variable           | Scope | Description |
 | ------------------ | ----- | ----------- |
-| `PROXY_PORT`       | CLI   | Overrides the target `http://localhost:<port>` used by HTTP-based CLI commands (`zg status`, `zg test`, `zg health`, `zg smoke`, etc.). |
+| `PROXY_PORT`       | CLI   | Overrides the target `http://localhost:<port>` used by HTTP-based CLI commands (`zg status`, `zg test`, `zg health`, `zg smoke`, etc.). `--port` on those commands takes precedence when provided. |
 | `ZEROGRAVITY_SRC`  | Dev CLI | Overrides source directory discovery for `zg rebuild` in source-based workflows. |
 | `ZEROGRAVITY_OS`   | Runtime | Override reported OS label for metadata/header alignment (`Linux`, `macOS`, `Windows`). |
 | `ZEROGRAVITY_IDE_VERSION` | Runtime | Override reported IDE version (preferred over `ZEROGRAVITY_CLIENT_VERSION`). |
