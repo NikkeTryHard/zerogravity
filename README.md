@@ -56,8 +56,8 @@ possible."
 | Phase 6 | Scaling groundwork | Completed |
 | Phase 7 | Native prompt pipeline | Completed |
 | Phase 8 | Native auth / project / metadata ownership | Completed |
-| Phase 9 | Telemetry and integrity policy cleanup | In progress |
-| Phase 10 | Transport boundary minimization | Planned |
+| Phase 9 | Telemetry and integrity policy cleanup | Completed |
+| Phase 10 | Transport boundary minimization | In progress |
 | Phase 11 | Final parity proof and release gate | Planned |
 
 ### Subtask Snapshot
@@ -70,7 +70,6 @@ possible."
   - The shipped native prompt path is in place across the public request surfaces.
   - The shipped native lane now owns auth, project, and request-metadata behavior without depending on proxy-side repair as the steady-state story.
 - In progress:
-  - Additional telemetry/integrity cleanup.
   - Further shrinking the transport boundary.
 - Planned:
   - Final end-to-end parity and release sign-off.
