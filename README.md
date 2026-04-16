@@ -1,13 +1,8 @@
-> [!IMPORTANT]
-> **Source code has moved to a private repository** for long-term sustainability.
-> Binaries, Docker images, and releases will continue to be published here.
+> [!WARNING]
+> **This repository is discontinued for now.**
+> Interest in the project has been lower than I hoped, I have had a lot of pressure from my own life, and ZeroGravity v2 has become technically demanding enough that I cannot justify active development right now.
 >
-> **Want access to the source?**
->
-> - [Open a Discussion](https://github.com/NikkeTryHard/zerogravity/discussions) on this repo
-> - [Join our Telegram](https://t.me/ZeroGravityProxy) and DM me
->
-> Read-only access is granted on request.
+> There might be future development during the coming summer if I have the time and energy to return to it.
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-555?style=flat-square" alt="Platform" />
